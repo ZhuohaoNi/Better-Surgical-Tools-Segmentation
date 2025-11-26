@@ -25,6 +25,8 @@ config_dict = {
         "SETR_MLA_SegSTRONGC": SETR_MLA_SegSTRONGC,
         "SETR_PUP_SegSTRONGC": SETR_PUP_SegSTRONGC,
         "UNet_SegSTRONGC": UNet_SegSTRONGC,
+        "UNetPlusPlus_SegSTRONGC": UNetPlusPlus_SegSTRONGC,
+        "Mask2Former_SegSTRONGC": Mask2Former_SegSTRONGC,
         "UNet_ENDOVIS": UNet_ENDOVIS,
         "UNet_ROBUSTMIS": UNet_ROBUSTMIS,
         "UNet_OPENGENSURGERY": UNet_OPENGENSURGERY,

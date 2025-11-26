@@ -44,7 +44,7 @@ class SegSTRONGC(data.Dataset):
                     image_folder = osp.join(set_folder, d)
                     for i in range(image_numbers):
                         image_name = str(i) + ".png"
-                        gt_name = str(i) + ".npy"
+                        gt_name = str(i) + ".png"
                         self.image_paths.append(osp.join(image_folder, 'left/' + image_name))
                         self.gt_paths.append(osp.join(gt_folder, 'left/' + gt_name))
                         self.image_paths.append(osp.join(image_folder, 'right/' + image_name))
@@ -58,7 +58,8 @@ class SegSTRONGC(data.Dataset):
     def __getitem__(self, idx: int):
         raw_image = np.array(Image.open(self.image_paths[idx])).astype(np.float32)
         image = raw_image.copy()
-        gt = np.load(self.gt_paths[idx]).astype(np.float32)
+        # Load GT from PNG and convert to numpy array, ensure it's float32 and normalized to [0, 1]
+        gt = np.array(Image.open(self.gt_paths[idx])).astype(np.float32) / 255.0
 
         # Apply transformation to image and ground truth
         if self.image_transforms is not None:

@@ -5,12 +5,13 @@ import torchvision.transforms as T
 
 transform = T.Compose([
     T.ToTensor(),
-    T.Resize((270, 480), interpolation = T.InterpolationMode.NEAREST)
+    T.Resize((288, 480), interpolation = T.InterpolationMode.NEAREST)
 ])
 
 class cfg:
     train_dataset = dict(
         name = "SegSTRONGC",
+        batch_size = 32,
         args = dict(
             root_folder = '/workspace/data', 
             split = 'SegSTRONGC_train',
@@ -48,13 +49,13 @@ class cfg:
             image_transforms = [transform],
             gt_transforms = [True],))
     model = dict(
-                name = "Unet",
+                name = "UnetPlusPlus",
                 params = dict(
                     input_dim = 3,
-                    hidden_dims = [512, 256, 128, 64, 32],
-                    size = (15, 20),
-                    target_size = (270, 480),
+                    encoder_name = "resnet34",
+                    encoder_weights = "imagenet",
                     criterion = BCEWithLogitsLoss(),
+                    target_size = (288, 480),
                     train_params = dict(
                         perturbation = None,
                         lr_scheduler = dict(
@@ -70,5 +71,5 @@ class cfg:
                                 weight_decay = 10e-5)),
                         max_epoch_number=40,
                         save_interval=5,
-                        save_path='/workspace/code/checkpoints/unet_segstrongc_fulldataset/',
+                        save_path='/workspace/code/checkpoints/unetplusplus_segstrongc_fulldataset/',
                         log_interval=50)))

@@ -22,6 +22,8 @@ def parse_args():
     parser.add_argument("--domain", type=str, default=None, choices=['regular', 'smoke', 'bg_change', 'blood', 'low_brightness'], help="Test/Validate domain")
     parser.add_argument("--save_dir", type=str, default=None, help="Path to save model output")
     parser.add_argument("--tau", type=int, default=5, help="Tolerance in normalized surface distance calculation")
+    parser.add_argument("--batch_size", type=int, default=1, help="Batch size for testing")
+    parser.add_argument("--num_workers", type=int, default=4, help="Number of workers for data loading")
     args = parser.parse_args()
     return args
 
@@ -37,6 +39,7 @@ def evaluate(model, dataloader, device, tau, save_dir=None):
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
     
+    total_samples = 0
     for i, (image, gt) in enumerate(dataloader):
 
         print("Iteration: ", i, "/", len(dataloader), end="\r")
@@ -47,37 +50,39 @@ def evaluate(model, dataloader, device, tau, save_dir=None):
         data['iteration'] = i
         pred = model(data)['pred']
         
-        result = (pred[0].cpu().detach().numpy() > 0.5).squeeze()
-        results.append(result)
+        # Process batch
+        preds_np = pred.cpu().detach().numpy()
+        gts_np = gt.cpu().numpy()
         
-        mask = (data['gt'].cpu().numpy() > 0.5).squeeze()
+        batch_size = preds_np.shape[0]
+        total_samples += batch_size
 
-        # plot_segmentation(result, mask, image, i)
-        # plot_augmentation(image.squeeze().to(torch.uint8), i)
-        
-
-        dice_tool = dice_scores(result, mask)
-        nsd = normalized_surface_distances(result, mask, tau)
-        dice_tools.append(dice_tool)
-        nsds.append(nsd)
-        if save_dir is not None:
-            results.append(result)
+        for b in range(batch_size):
+            result = (preds_np[b] > 0.5).squeeze()
+            mask = (gts_np[b] > 0.5).squeeze()
+            
+            dice_tool = dice_scores(result, mask)
+            nsd = normalized_surface_distances(result, mask, tau)
+            dice_tools.append(dice_tool)
+            nsds.append(nsd)
+            
+            if save_dir is not None:
+                results.append(result)
         
     elapsed = time.time() - start
-    print("iteration per Sec: %f" %
-        ((i+1) / elapsed))
+    print("Samples per Sec: %f" %
+        (total_samples / elapsed))
     print("mean: dice_tool: %f " %
-            (np.mean([dice_tools])))
+            (np.mean(dice_tools)))
     print("std: dice_tool: %f " %
-            (np.std([dice_tools])))
+            (np.std(dice_tools)))
     print("mean: nsd: %f" %
-            (np.mean([nsds])))
+            (np.mean(nsds)))
     print("std: nsd: %f" %
-            (np.std([nsds])))
+            (np.std(nsds)))
     
     if save_dir is not None:
         np.save(os.path.join(save_dir, "pred.npy"), results)
-    
 
 if __name__ == "__main__":
     args = parse_args()
@@ -104,10 +109,10 @@ if __name__ == "__main__":
 
     if args.test:
         dataset = dataset_dict[cfg.test_dataset['name']](**(cfg.test_dataset['args']))
-        dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
+        dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
     else:
         dataset = dataset_dict[cfg.validation_dataset['name']](**(cfg.validation_dataset['args']))
-        dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
+        dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
         
     model = build_model(cfg.model, device)
     model.load_parameters(args.model_path)

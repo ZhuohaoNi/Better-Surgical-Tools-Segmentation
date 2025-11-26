@@ -1,5 +1,7 @@
 
 from .unet import Unet
+from .unetplusplus import UnetPlusPlus
+from .mask2former import Mask2Former
 from .hrnet import HRNet
 from .stm import STM
 from .setr import SETR_Naive, SETR_MLA, SETR_PUP
@@ -9,6 +11,8 @@ from .tta import SegmentationTTAWrapper
 
 model_dict = {
     "Unet":Unet,
+    "UnetPlusPlus": UnetPlusPlus,
+    "Mask2Former": Mask2Former,
     "HRNet": HRNet,
     "STM": STM,
     "SETR_Naive": SETR_Naive,

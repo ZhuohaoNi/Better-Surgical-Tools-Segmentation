@@ -2,6 +2,8 @@ import os
 import time
 import torch
 import torch.nn as nn
+from torch.cuda.amp import autocast, GradScaler
+from tqdm import tqdm
 
 class VisionBase(nn.Module):
     def __init__(self, params, device):
@@ -43,30 +45,46 @@ class VisionBase(nn.Module):
             lr_scheduler = lr_scheduler["lr_scheduler_class"](optimizer, **(lr_scheduler["args"]))
             current_epoch_numbers = 0
             loss_plot = []
+        
+        # Initialize GradScaler for mixed precision training
+        scaler = GradScaler()
 
         for e in range(current_epoch_numbers, max_epoch_number):
             self.train()
             running_loss = 0
             start = time.time()
-            for i, (image, gt) in enumerate(train_dataloader):
+            pbar = tqdm(enumerate(train_dataloader), total=len(train_dataloader), 
+                       desc=f'Epoch {e+1}/{max_epoch_number}')
+            for i, (image, gt) in pbar:
                 self.zero_grad()
                 data = {}
                 if perturbation is not None:
                     image = perturbation(image/255) * 255
                 data['image'] = image.to(device=device)
                 data['gt'] = gt.to(device=device)
-                pred, loss = self.forward(data, return_loss=True)
                 
-                loss.backward()
-                optimizer.step()
+                # Mixed precision forward pass
+                with autocast():
+                    pred, loss = self.forward(data, return_loss=True)
+                
+                # Mixed precision backward pass
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+                
                 running_loss += loss.item()
                 elapsed = time.time() - start
                 if (i+1) % log_interval == 0:
                     loss_plot.append(running_loss / (i+1))
-                    print("Epoch_step : %d Loss: %f iteration per Sec: %f" %
-                            (i+1, running_loss / (i+1), (i+1)*pred.size(0) / elapsed))
-            print("Epoch : %d Loss: %f iteration per Sec: %f" %
-                            (e, running_loss / (i+1), (i+1)*pred.size(0) / elapsed))
+                
+                # Update progress bar with loss and speed
+                pbar.set_postfix({
+                    'Loss': f'{running_loss / (i+1):.6f}',
+                    'Speed': f'{(i+1)*pred.size(0) / elapsed:.1f} it/s'
+                })
+            
+            print(f"Epoch {e+1}/{max_epoch_number} - Loss: {running_loss / (i+1):.6f} - "
+                  f"Speed: {(i+1)*pred.size(0) / elapsed:.1f} it/s")
             lr_scheduler.step()
             if (e+1) % save_interval == 0:
                 save_dict = {}

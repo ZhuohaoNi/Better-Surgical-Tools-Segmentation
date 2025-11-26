@@ -6,6 +6,8 @@ from .loss import *
 model_dict = {
                 "CaRTS": CaRTS,
                 "Unet": Unet,
+                "UnetPlusPlus": UnetPlusPlus,
+                "Mask2Former": Mask2Former,
                 "HRNet": HRNet,
                 "STM": STM,
                 "SETR_Naive": SETR_Naive,

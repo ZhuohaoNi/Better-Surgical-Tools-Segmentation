@@ -117,8 +117,10 @@ class Unet(VisionBase):
         result = self.outc(feature_map)
         if return_loss:
             gt = x['gt']
-            loss = self.criterion(result.sigmoid(), gt)
+            # BCEWithLogitsLoss applies sigmoid internally, so pass raw logits
+            loss = self.criterion(result, gt)
             return result, loss
         else:
+            # Only apply sigmoid for inference
             x['pred'] = result.sigmoid()
             return x
