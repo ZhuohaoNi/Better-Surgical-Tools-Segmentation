@@ -8,14 +8,6 @@ model_dict = {
                 "Unet": Unet,
                 "UnetPlusPlus": UnetPlusPlus,
                 "Mask2Former": Mask2Former,
-                "HRNet": HRNet,
-                "STM": STM,
-                "SETR_Naive": SETR_Naive,
-                "SETR_MLA": SETR_MLA,
-                "SETR_PUP": SETR_PUP,
-                "DeepLabv3_plus": DeepLabv3_plus,
-                "Segformer": Segformer,
-                "SegmentationTTAWrapper": SegmentationTTAWrapper,
             }
 
 def build_model(model, device):
