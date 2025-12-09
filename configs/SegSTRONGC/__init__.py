@@ -1,2 +1,3 @@
 from .Networks import UNet_SegSTRONGC, UNetPlusPlus_SegSTRONGC, Mask2Former_SegSTRONGC
 from .Augmentation import UNet_SegSTRONGC_Projective, UNet_SegSTRONGC_AutoAugment, UNet_SegSTRONGC_Elastic
+from .Foundation import SAM3_SegSTRONGC

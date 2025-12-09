@@ -1,9 +1,11 @@
 # From U-Net to Transformers: Robustness and Sim-to-Real Transfer in Surgical Vision
 
-This repository contains the official implementation for the paper: **"From U-Net to Transformers: Robustness and Sim-to-Real Transfer in Surgical Vision"**.
+This repository contains the official implementation for the project report: **"From U-Net to Transformers: Robustness and Sim-to-Real Transfer in Surgical Vision"**.
+
+**Citation:** The code is based on the [CaRTS repository](https://github.com/hding2455/CaRTS).
 
 ## Abstract
-While modern surgical tool segmentation models achieve high accuracy on clean data, their performance degrades drastically under real-world artifacts like smoke, bleeding, and low lighting. This study investigates architectural robustness against these corruptions and the transferability of synthetic training to real surgical videos. We evaluated four architectures (U-Net, U-Net++, Mask2Former, and SAM) on the SegSTRONG-C benchmark. Our results demonstrate that transformer-based architectures (Mask2Former) significantly outperform classical CNNs under corruption, achieving the highest Dice scores across most degraded domains.
+While modern surgical tool segmentation models achieve high accuracy on clean data, their performance degrades drastically under real-world artifacts like smoke, bleeding, and low lighting. This study investigates architectural robustness against these corruptions and the transferability of synthetic training to real surgical videos. We evaluated four architectures (U-Net, U-Net++, Mask2Former, and SAM) on the [SegSTRONG-C benchmark](https://github.com/hding2455/CaRTS). Our results demonstrate that transformer-based architectures (Mask2Former) significantly outperform classical CNNs under corruption, achieving the highest Dice scores across most degraded domains.
 
 ## Supported Models
 This repository supports training and evaluation of the following models on the SegSTRONG-C dataset:
@@ -55,6 +57,20 @@ python validate.py \
     --domain smoke \
     --save_dir results/smoke
 ```
+
+### SAM3
+To use SAM3 foundation model for inference, run
+
+**Example:**
+```bash
+python ./sam3_validate.py --config SAM3_SegSTRONGC --test True --domain bg_change
+
+### YOLO
+To use YOLOv11 model fine-tuning, run
+
+**Example:**
+```bash
+python yolo/train.py
 
 ### Visualization
 We provide a script to generate side-by-side comparisons of all models across all domains.
