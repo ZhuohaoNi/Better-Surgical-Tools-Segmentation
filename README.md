@@ -64,6 +64,7 @@ To use SAM3 foundation model for inference, run
 **Example:**
 ```bash
 python ./sam3_validate.py --config SAM3_SegSTRONGC --test True --domain bg_change
+```
 
 ### YOLO
 To use YOLOv11 model fine-tuning, run
@@ -71,6 +72,7 @@ To use YOLOv11 model fine-tuning, run
 **Example:**
 ```bash
 python yolo/train.py
+```
 
 ### Visualization
 We provide a script to generate side-by-side comparisons of all models across all domains.
