@@ -2,7 +2,7 @@
 
 This repository contains the official implementation for the project report: **"From U-Net to Transformers: Robustness and Sim-to-Real Transfer in Surgical Vision"**.
 
-**Citation:** The code is based on the [CaRTS repository](https://github.com/hding2455/CaRTS).
+The code is based on the [CaRTS repository](https://github.com/hding2455/CaRTS).
 
 ## Abstract
 While modern surgical tool segmentation models achieve high accuracy on clean data, their performance degrades drastically under real-world artifacts like smoke, bleeding, and low lighting. This study investigates architectural robustness against these corruptions and the transferability of synthetic training to real surgical videos. We evaluated four architectures (U-Net, U-Net++, Mask2Former, and SAM) on the [SegSTRONG-C benchmark](https://github.com/hding2455/CaRTS). Our results demonstrate that transformer-based architectures (Mask2Former) significantly outperform classical CNNs under corruption, achieving the highest Dice scores across most degraded domains.
